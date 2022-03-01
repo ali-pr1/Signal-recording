@@ -75,8 +75,8 @@ for c=1:5
                             point_freq{c}(n+1,bot(j,n))=1;
                         else
                             point_freq{c}(n+1,bot(j,n))=0;
-                            % at the count 1 for each row and divide by
-                            % length of each row. that percentage is waht
+                            % add the count 1 for each row and divide by
+                            % length of each row. that percentage is what
                             % we want
                         end
                     end
