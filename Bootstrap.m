@@ -48,7 +48,7 @@ for c = 4:8
 end
 % for loop below is for bootstrap analysis
 for c=1:5
-    bot=bootsamples{c+3};
+    bot=bootsamples{c};
     for clus_num=1:c+3
         idk= cell(2,nboot);
         % initial cluster members
