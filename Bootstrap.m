@@ -50,17 +50,15 @@ end
 for c=1:5
     bot=bootsamples{c};
     for clus_num=1:c+3
+        botat=bootstats{c};
         idk= cell(2,nboot);
-        % initial cluster members
         lab=index{c,clus_num};
         for n=1:nboot
-            % this vector contains label number of each cluster elements
-            % after bootstrap
             X=[];
             for i=1:length(lab)
                 for j=1:length(bot(:,n))
                     if bot(j,n)== lab(i)
-                        X(end+1)=bootstats{c,clus_num}(n,j);
+                        X(end+1)=botat(n,j);
                     end
                 end
             end
@@ -70,14 +68,11 @@ for c=1:5
             clear X
             for j=1:length(bot(:,n))
                 for i=1:length(index{c,clus_num})
-                    if bot(j,n)== index{c,clus_num}(i)
-                        if bootstats{c,clus_num}(n,j)==M
+                    if bot(j,n)== lab(i)
+                        if botat(n,j)==M
                             point_freq{c}(n+1,bot(j,n))=1;
                         else
-                            point_freq{c}(n+1,bot(j,n))=0;
-                            % add the count 1 for each row and divide by
-                            % length of each row. that percentage is what
-                            % we want
+                            point_freq{c}(n+1,bot(j,n))=-1;
                         end
                     end
                 end
@@ -86,4 +81,30 @@ for c=1:5
         swap_mat{c,clus_num}=idk;
         clear idk
     end
+    clear bot
+end
+for c=1:5
+    for i=1:c+3
+        Vec=[];
+        q=swap_mat{c,i};
+        for j=1:nboot
+            Vec(end+1)=q{2,j}(2);
+        end
+        format = "hist_%0d_kemans_%0d_label .png";
+        filename=sprintf(format,c+3,i);
+        histogram(Vec);
+        saveas(gcf,filename)
+    end
+end
+for c=1:5
+    vec=[];
+    stab=point_freq{1,c};
+    for j=1:length(stab(1,:))
+        freq=sum(stab(:,j)==1)/(sum(stab(:,j)==1)+sum(stab(:,j)==-1));
+        vec(end+1)=freq;
+    end
+    format = "freq_%0d_kemans.png";
+    filename=sprintf(format,c+3);
+    histogram(vec);
+    saveas(gcf,filename) 
 end
