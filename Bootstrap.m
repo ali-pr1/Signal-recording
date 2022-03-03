@@ -12,8 +12,6 @@ for c = 4:8
     % I started analysis on 4-8 clusters clustering
     [idx,C] = kmeans(DataA,c,'Distance','Cosine');
     label=idx;
-    figure
-    gscatter(DataA(:,1),DataA(:,2),idx)
     dataTable.label=label;
     figure;
     gscatter(DataA(:,1),DataA(:,2),idx)
