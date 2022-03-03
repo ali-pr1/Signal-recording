@@ -3,7 +3,7 @@ DataA=readmatrix('trial.xlsx');
 DataA=DataA(:,[2,3]);
 index = cell(5,8);
 labels=cell(1,5);
-clust = zeros(size(DataA,1),11);
+clust = zeros(size(DataA,1),8);
 for c = 2:12
     dataTable = readtable('trial.xlsx');
     % 12 clusters was not stable even without bootstraping
@@ -13,17 +13,17 @@ for c = 2:12
     % I started analysis on 4-8 clusters clustering
     [idx,C] = kmeans(DataA,c,'Distance','Cosine');
     label=idx;
-    clust(:,c-3)=label;
+    clust(:,c-1)=label;
     dataTable.label=label;
-    figure;
+    figure
     gscatter(DataA(:,1),DataA(:,2),idx)
     %format = "cosine kmeans_%0d .xlsx";
     %filename=sprintf(format,c);
     %writetable(dataTable,filename)
     d_c = vertcat(label);
-    labels{c-3} = d_c;
+    labels{c-1} = d_c;
     for k=1:c
-        index{c-3,k}=find(label==k);
+        index{c-1,k}=find(label==k);
     end
         
 end
@@ -31,7 +31,7 @@ eva1 = evalclusters(DataA,clust,'CalinskiHarabasz');
 eva2=  evalclusters(DataA,clust,'silhouette','Distance','cosine');
 eva3=  evalclusters(DataA,clust,'DaviesBouldin');
 A=zeros(11,4);
-A(:,1)=eval.InspectedK;
+A(:,1)=eva1.InspectedK;
 A(:,2)=eva1.CriterionValues;
 A(:,3)=eva2.CriterionValues;
 A(:,4)=eva3.CriterionValues;
