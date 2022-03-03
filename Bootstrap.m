@@ -81,20 +81,38 @@ for c=1:5
     end
     clear bot
 end
+%extract plots
+wt=cell(1,5);
 for c=1:5
+    A=zeros(nboot,c+3);
+    B=zeros(1,nboot);
     for i=1:c+3
         Vec=[];
         q=swap_mat{c,i};
         for j=1:nboot
             Vec(end+1)=q{2,j}(2);
+            A(j,i)=q{2,j}(1);
         end
         format = "hist_%0d_kemans_%0d_label .png";
         filename=sprintf(format,c+3,i);
         histogram(Vec);
         saveas(gcf,filename)
     end
+    for n=1:nboot
+        B(n)=sum(A(n,:)==mode(A(n,:)));
+    end
+   wt{1,c}=B;     
+end
+% check if the mode repeats more than once
+test=zeros(1,5);
+for i=1:length(test)
+x=wt{1,i};
+test(i)=length(x(x~=1));
 end
 for c=1:5
+    format='cosine kmeans_%0d .xlsx';
+    filename=sprintf(format,c+3);
+    dataTable = readtable(filename);
     vec=[];
     stab=point_freq{1,c};
     for j=1:length(stab(1,:))
@@ -102,7 +120,27 @@ for c=1:5
         vec(end+1)=freq;
     end
     format = "freq_%0d_kemans.png";
-    filename=sprintf(format,c+3);
+    filename1=sprintf(format,c+3);
     histogram(vec);
-    saveas(gcf,filename) 
+    dataTable.freq=transpose(vec);
+    format2='cosine kmeans_%0d_final .xlsx';
+    filename2=sprintf(format2,c+3);
+    writetable(dataTable,filename2)
+    saveas(gcf,filename1) 
+end
+
+for u=1:5
+    format='cosine kmeans_%0d_final .xlsx';
+    filename=sprintf(format,u+3);
+    dataTable = readmatrix(filename);  
+    x=dataTable(:,2);
+    y=dataTable(:,3);
+    z=dataTable(:,5);
+    c=dataTable(:,6);
+    scatter3(x,y,z,8,c,'filled')
+    colorbar
+    colormap cool
+    format = "scatter_%0d_kemans.fig";
+    filename=sprintf(format,u+3);
+    saveas(gcf,filename)
 end
