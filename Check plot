@@ -1,0 +1,38 @@
+cd 'E:/ALI/processing project/signal recording'
+nboot=1000;
+A=zeros(nboot,8);
+B=zeros(1,nboot);
+C=[];
+    for i=1:8
+        Vec=[];
+        q=swap_mat{5,i};
+        for j=1:nboot
+            Vec(end+1)=q{2,j}(2);
+            A(j,i)=q{2,j}(1);
+        end
+    end
+    for n=1:nboot
+        B(n)=sum(A(n,:)==mode(A(n,:)));
+        if B(n)>2
+            C(end+1)=n;
+        end 
+    end
+    DataA=readmatrix('cosine kmeans_8 .xlsx', 'NumHeaderLines',1);
+    j=0;
+    for i=1:length(C)
+        j=j+1;
+        format = "8_check_scatter_%0d.png";
+        filename=sprintf(format,j);
+        U=bootsamples{1,5}(:,C(i));
+        D=DataA(U,:);
+        Q=transpose(bootstats{1,5}(C(i),:));
+        D(:,end+1)=Q;
+        subplot(1,2,1);
+        gscatter(D(:,2),D(:,3),D(:,end-1));
+        title('Old labels');
+        subplot(1,2,2);
+        gscatter(D(:,2),D(:,3),D(:,end));
+        title('New labels');
+        saveas(gcf,filename)
+        clear D
+    end
