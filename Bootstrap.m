@@ -1,5 +1,5 @@
 cd 'E:/ALI/processing project/signal recording'
-DataA=readmatrix('trial.xlsx');
+DataB=readmatrix('trial.xlsx');
 DataA=DataA(:,[2,3]);
 index = cell(5,8);
 labels=cell(1,5);
@@ -22,6 +22,9 @@ for c = 4:8
     labels{c-3} = d_c;
     for k=1:c
         index{c-3,k}=find(label==k);
+        for i=1:length(index{c-1,k})
+             index{c-1,k}(i,2)=DataB(index{c-1,k}(i,1),4);
+        end
     end
         
 end
@@ -143,4 +146,31 @@ for u=1:5
     format = "scatter_%0d_kemans.fig";
     filename=sprintf(format,u+3);
     saveas(gcf,filename)
+end
+
+
+% stack bar plots:
+stack=cell(5,1);
+vec=[0.0, 0.083333333, 0.166666667,0.25,0.333333333,0.416666667,0.5,0.583333333,0.666666667,0.75,0.833333333,0.916666667,1.0];
+for c = 4:8
+    D=zeros(c,13);
+    for k=1:c
+        for j=1:13
+            freq=vec(j);
+            A=sum(index{c-1,k}(:,2)==freq);
+            D(k,j)=A;
+        end
+     stack{c-3,1}=D;
+    end
+end
+for i=1:5
+ U=stack{i,1};
+ format = "stacked_%0d_kemans.fig";
+ filename=sprintf(format,i+1);
+ figure
+ bar(U,'stacked');
+ %ylim([0 14000])
+ title(sprintf('%d kmeans cluster ratios',i+1));
+ legend(string(1:i+1),'Location','bestoutside')
+ saveas(gcf,filename)
 end
