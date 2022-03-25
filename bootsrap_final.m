@@ -13,7 +13,7 @@ Y = data(:,2)-P(2);
 for c = 2:6
     dataTable = readtable('shotgun.xlsx');
     % Kmeans clustering, cosine metric, for probable suitable candidates
-    [idx,C] = kmeans(data,c,'Distance','Cosine','Replicates',5, ...
+    [idx,C] = kmeans([X,Y],c,'Distance','Cosine','Replicates',5, ...
             'MaxIter',1000);
     label=idx;
     %plot clusters
