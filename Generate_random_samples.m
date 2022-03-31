@@ -1,5 +1,6 @@
 % generate random samples; consider you want replacment or not
 cd 'E:/ALI/processing project/signal recording'
+% set the step of random sample size
 samp_size=[2000:2000:25000];
 data=readmatrix('trial.xlsx', 'NumHeaderLines',1);
 data=data(:,[2,3]);
@@ -13,13 +14,14 @@ Calinski=zeros(1,length(samp_size));
 silhouette=zeros(1,length(samp_size));
 Davies=zeros(1,length(samp_size));
 for i=1:length(samp_size)
+    % generate random sample
     ran=randsample(21157,samp_size(i),true);
     new_data=zeros(samp_size(i),2);
     for j=1:samp_size(i)
         new_data(j,:)=data(ran(j),:);
     end
     clust = zeros(size(new_data,1),5);
-    % I'm a little unsure about choosing c
+    % loop over different K in kmeans
     for c = 6:10
         [idx,C] = kmeans(new_data,c,'Distance','Cosine','Replicates',5, ...
             'MaxIter',1000);
@@ -28,6 +30,7 @@ for i=1:length(samp_size)
         label=idx;
         clust(:,c-5)=label;
     end
+    % calculate the score
     eva1 = evalclusters(new_data,clust,'CalinskiHarabasz');
     eva2=  evalclusters(new_data,clust,'silhouette','Distance','cosine');
     eva3=  evalclusters(new_data,clust,'DaviesBouldin');
@@ -35,6 +38,10 @@ for i=1:length(samp_size)
     silhouette(i)=eva2.OptimalK;
     Davies(i)=eva3.OptimalK;
 end
+% export silhouette as data for inference
+
+
+%%%% ignore below
 inf=zeros(4,5);
 inf(1,:)=[6:10];
 for c=6:10
