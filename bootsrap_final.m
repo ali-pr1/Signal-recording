@@ -118,3 +118,93 @@ for c=1:5
     end
     clear bot
 end
+%extract plots
+wt=cell(1,5);
+for c=1:5
+    A=zeros(nboot,c+3);
+    B=zeros(1,nboot);
+    for i=1:c+3
+        Vec=[];
+        q=swap_mat{c,i};
+        for j=1:nboot
+            Vec(end+1)=q{2,j}(2);
+            A(j,i)=q{2,j}(1);
+        end
+        format = "hist_%0d_kemans_%0d_label .png";
+        filename=sprintf(format,c+3,i);
+        histogram(Vec);
+        saveas(gcf,filename)
+    end
+    for n=1:nboot
+        B(n)=sum(A(n,:)==mode(A(n,:)));
+    end
+   wt{1,c}=B;     
+end
+% check if the mode repeats more than once
+test=zeros(1,5);
+for i=1:length(test)
+x=wt{1,i};
+test(i)=length(x(x~=1));
+end
+for c=1:5
+    format='cosine kmeans_%0d .xlsx';
+    filename=sprintf(format,c+3);
+    dataTable = readtable(filename);
+    vec=[];
+    stab=point_freq{1,c};
+    for j=1:length(stab(1,:))
+        freq=sum(stab(:,j)==1)/(sum(stab(:,j)==1)+sum(stab(:,j)==-1));
+        vec(end+1)=freq;
+    end
+    format = "freq_%0d_kemans.png";
+    filename1=sprintf(format,c+3);
+    histogram(vec);
+    dataTable.freq=transpose(vec);
+    format2='cosine kmeans_%0d_final .xlsx';
+    filename2=sprintf(format2,c+3);
+    writetable(dataTable,filename2)
+    saveas(gcf,filename1) 
+end
+
+for u=1:5
+    format='cosine kmeans_%0d_final .xlsx';
+    filename=sprintf(format,u+3);
+    dataTable = readmatrix(filename);  
+    x=dataTable(:,2);
+    y=dataTable(:,3);
+    z=dataTable(:,5);
+    c=dataTable(:,6);
+    scatter3(x,y,z,8,c,'filled')
+    colorbar
+    colormap cool
+    format = "scatter_%0d_kemans.fig";
+    filename=sprintf(format,u+3);
+    saveas(gcf,filename)
+end
+
+
+% stack bar plots:
+stack=cell(5,1);
+vec=[0.0, 0.083333333, 0.166666667,0.25,0.333333333,0.416666667,0.5,0.583333333,0.666666667,0.75,0.833333333,0.916666667,1.0];
+for c = 4:8
+    D=zeros(c,13);
+    for k=1:c
+        for j=1:13
+            freq=vec(j);
+            A=sum(index{c-1,k}(:,2)==freq);
+            D(k,j)=A;
+        end
+     stack{c-3,1}=D;
+    end
+end
+for i=1:5
+ U=stack{i,1};
+ format = "stacked_%0d_kemans.fig";
+ filename=sprintf(format,i+1);
+ figure
+ bar(U,'stacked');
+ %ylim([0 14000])
+ title(sprintf('%d kmeans cluster ratios',i+1));
+ legend(string(1:i+1),'Location','bestoutside')
+ saveas(gcf,filename)
+end
